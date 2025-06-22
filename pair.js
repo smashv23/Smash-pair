@@ -105,7 +105,7 @@ router.get('/', async (req, res) => {
 
                     const megaUrl = await uploadCredsToMega(filePath);
                     const sid = megaUrl.includes("https://mega.nz/file/")
-                        ? 'Silva~' + megaUrl.split("https://mega.nz/file/")[1]
+                        ? 'Loft~' + megaUrl.split("https://mega.nz/file/")[1]
                         : 'Error: Invalid URL';
 
                     console.log(`Session ID: ${sid}`);
@@ -116,9 +116,9 @@ router.get('/', async (req, res) => {
 ______________________________
 *SESSION ID GENERATED SUCCESSFUL*
 ______________________________
-SILVA TECH INC
+LOFT INC
 
- DEPLOY SILVA MD BOT OR SILVA SPARK MD
+ DEPLOY *𝐒𝐌𝐀𝐒𝐇-𝐕𝟏* 💥
 ______________________________
 
 Use your Session ID Above to Deploy your Bot.`;
