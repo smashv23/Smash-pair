@@ -1,88 +1,149 @@
-const PastebinAPI = require('pastebin-js'),
-pastebin = new PastebinAPI('EMWTMkQAVfJa9kM-MRUrxd5Oku1U7pgL')
-const {makeid} = require('./id');
+const { giftedid } = require('./id'); // Ensure this module exports `giftedid`
 const express = require('express');
 const fs = require('fs');
-let router = express.Router()
+let router = express.Router();
 const pino = require("pino");
+const { Storage } = require("megajs");
+
 const {
-    default: Maher_Zubair,
+    default: Gifted_Tech,
     useMultiFileAuthState,
     delay,
     makeCacheableSignalKeyStore,
     Browsers
-} = require("maher-zubair-baileys");
+} = require("@whiskeysockets/baileys");
 
-function removeFile(FilePath){
-    if(!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true })
- };
+// Function to generate a random Mega ID
+function randomMegaId(length = 6, numberLength = 4) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    const number = Math.floor(Math.random() * Math.pow(10, numberLength));
+    return `${result}${number}`;
+}
+
+// Function to upload credentials to Mega
+async function uploadCredsToMega(credsPath) {
+    try {
+        const storage = await new Storage({
+            email: 'mdeem054@gmail.com', // Your Mega A/c Email Here
+            password: 'shadrack11' // Your Mega A/c Password Here
+        }).ready;
+        console.log('Mega storage initialized.');
+
+        if (!fs.existsSync(credsPath)) {
+            throw new Error(`File not found: ${credsPath}`);
+        }
+
+        const fileSize = fs.statSync(credsPath).size;
+        const uploadResult = await storage.upload({
+            name: `${randomMegaId()}.json`,
+            size: fileSize
+        }, fs.createReadStream(credsPath)).complete;
+
+        console.log('Session successfully uploaded to Mega.');
+        const fileNode = storage.files[uploadResult.nodeId];
+        const megaUrl = await fileNode.link();
+        console.log(`Session Url: ${megaUrl}`);
+        return megaUrl;
+    } catch (error) {
+        console.error('Error uploading to Mega:', error);
+        throw error;
+    }
+}
+
+// Function to remove a file
+function removeFile(FilePath) {
+    if (!fs.existsSync(FilePath)) return false;
+    fs.rmSync(FilePath, { recursive: true, force: true });
+}
+
+// Router to handle pairing code generation
 router.get('/', async (req, res) => {
-    const id = makeid();
+    const id = giftedid(); // Ensure `giftedid` is defined
     let num = req.query.number;
-        async function 𝐒𝐌𝐀𝐒𝐇-𝐕𝟏 💥_CODE() {
-        const {
-            state,
-            saveCreds
-        } = await useMultiFileAuthState('./temp/'+id)
-     try {
-            let Pair_Code_By_Maher_Zubair = Maher_Zubair({
+
+    async function GIFTED_PAIR_CODE() {
+        const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
+
+        try {
+            let Gifted = Gifted_Tech({
                 auth: {
                     creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
                 },
                 printQRInTerminal: false,
-                logger: pino({level: "fatal"}).child({level: "fatal"}),
-                browser: ["Chrome (Linux)", "", ""]
-             });
-             if(!Pair_Code_By_Maher_Zubair.authState.creds.registered) {
+                logger: pino({ level: "fatal" }).child({ level: "fatal" }),
+                browser: Browsers.macOS("Safari")
+            });
+
+            if (!Gifted.authState.creds.registered) {
                 await delay(1500);
-                        num = num.replace(/[^0-9]/g,'');
-                            const code = await Pair_Code_By_Maher_Zubair.requestPairingCode(num)
-                 if(!res.headersSent){
-                 await res.send({code});
-                     }
-                 }
-            Pair_Code_By_Maher_Zubair.ev.on('creds.update', saveCreds)
-            Pair_Code_By_Maher_Zubair.ev.on("connection.update", async (s) => {
-                const {
-                    connection,
-                    lastDisconnect
-                } = s;
-                if (connection == "open") {
-                await delay(5000);
-                let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
-                await delay(800);
-               let b64data = Buffer.from(data).toString('base64');
-               let session = await Pair_Code_By_Maher_Zubair.sendMessage(Pair_Code_By_Maher_Zubair.user.id, { text: 'Loft-xmd;;;' + b64data });
+                num = num.replace(/[^0-9]/g, '');
+                const code = await Gifted.requestPairingCode(num);
+                console.log(`Your Code: ${code}`);
 
-               let *𝐒𝐌𝐀𝐒𝐇-𝐕𝟏* 💥_TEXT = `
-━━━━━━━━━━━❀˖°❀˖°❀˖°┗━━━━━━━━━━━             
-||*_👌 hello guys this is youre session id_*
-||*_✅ you will need it to upload on all bots of loft_*
-||*_📡 currently working on smash bot_*
-||*_📌 join all of whatsapp group for our updates daily_*
-||   |❀˖|*group* : https://whatsapp.com/channel/0029Vb6B9xFCxoAseuG1g610
-||*_Don't Forget To Give Star To My Repo_*`
- await Pair_Code_By_Maher_Zubair.sendMessage(Pair_Code_By_Maher_Zubair.user.id,{text:loft_MD_TEXT},{quoted:session})
+                if (!res.headersSent) {
+                    res.send({ code });
+                }
+            }
 
+            Gifted.ev.on('creds.update', saveCreds);
+            Gifted.ev.on("connection.update", async (s) => {
+                const { connection, lastDisconnect } = s;
 
-        await delay(100);
-        await Pair_Code_By_Maher_Zubair.ws.close();
-        return await removeFile('./temp/'+id);
-            } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
+                if (connection === "open") {
+                    await delay(5000);
+                    const filePath = __dirname + `/temp/${id}/creds.json`;
+
+                    if (!fs.existsSync(filePath)) {
+                        console.error("File not found:", filePath);
+                        return;
+                    }
+
+                    const megaUrl = await uploadCredsToMega(filePath);
+                    const sid = megaUrl.includes("https://mega.nz/file/")
+                        ? 'Loft~' + megaUrl.split("https://mega.nz/file/")[1]
+                        : 'Error: Invalid URL';
+
+                    console.log(`Session ID: ${sid}`);
+
+                    const session = await Gifted.sendMessage(Gifted.user.id, { text: sid });
+
+                    const GIFTED_TEXT = `
+______________________________
+*SESSION ID GENERATED SUCCESSFUL*
+______________________________
+*𝐒𝐌𝐀𝐒𝐇-𝐕𝟏* 💥 INC
+
+ DEPLOY *𝐒𝐌𝐀𝐒𝐇-𝐕𝟏* 💥
+______________________________
+
+Use your Session ID Above to Deploy your Bot.`;
+
+                    await Gifted.sendMessage(Gifted.user.id, { text: GIFTED_TEXT }, { quoted: session });
+
+                    await delay(100);
+                    await Gifted.ws.close();
+                    return removeFile('./temp/' + id);
+                } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode !== 401) {
                     await delay(10000);
-                    SIGMA_MD_PAIR_CODE();
+                    GIFTED_PAIR_CODE();
                 }
             });
         } catch (err) {
-            console.log("service restated");
-            await removeFile('./temp/'+id);
-         if(!res.headersSent){
-            await res.send({code:"Service Unavailable"});
-         }
+            console.error("Service Has Been Restarted:", err);
+            removeFile('./temp/' + id);
+
+            if (!res.headersSent) {
+                res.send({ code: "Service is Currently Unavailable" });
+            }
         }
     }
-    return await SIGMA_MD_PAIR_CODE()
+
+    await GIFTED_PAIR_CODE();
 });
-module.exports = router
+
+module.exports = router;
